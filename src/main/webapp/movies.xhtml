@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+
+
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <h:form id="MovieListForm">
+            <p:panel>
+                <p:dataTable id="datalist" value="#{gettingJson.movies}" var="item"
+                             selectionMode="single" selection="#{gettingJson.movieSelected}"
+                             paginator="true"
+                             rowKey="#{item.idMovie}"
+                             rows="10"
+                             rowsPerPageTemplate="10,20,30,40,50" 
+                             >
+
+                    <p:ajax event="rowSelect"   update="viewButton"/>
+                    <p:ajax event="rowUnselect" update="viewButton"/>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Name movie"/>
+                        </f:facet>
+                        <h:outputText value="#{item.nameMovie}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Year movie"/>
+                        </f:facet>
+                        <h:outputText value="#{item.yearMovie}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <p:commandButton id="viewButton"   icon="ui-icon-search" value="View" update=":MovieViewForm" oncomplete="PF('MovieViewDialog').show()" disabled="#{empty gettingJson.movieSelected}"/>
+                        <p:commandButton id="createButton" icon="ui-icon-plus"   value="Create" update=":MovieCreateForm" oncomplete="PF('MovieCreateDialog').show()"/>
+                        <p:commandButton id="editButton" icon="ui-icon-delete"   value="Edit" update=":MovieEditForm" oncomplete="PF('MovieEditDialog').show()"/>
+                        <p:commandButton id="deleteButton" icon="ui-icon-delete"   value="Delete" update=":MovieListForm:datalist" actionListener="#{gettingJson.deleteMovie()}"/>
+
+                    </f:facet>
+                </p:dataTable>
+
+
+            </p:panel>
+
+        </h:form>
+        <p:dialog id="MovieViewDialog" widgetVar="MovieViewDialog" modal="true" resizable="false" appendTo="@(body)" header="Ver">
+            <h:form id="MovieViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" >
+                        <h:outputText value="Name movie"/>
+                        <h:outputText value="#{gettingJson.movieSelected.nameMovie}" />
+                        <h:outputText value="Year movie"/>
+                        <h:outputText value="#{gettingJson.movieSelected.yearMovie}"/>
+
+
+                    </p:panelGrid>
+                    <p:commandButton value="Cerrar" onclick="MovieViewDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="MovieCreateDialog" widgetVar="MovieCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="Create Movie">
+            <h:form id="MovieCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" >
+                        <p:outputLabel value="Name movie" for="nameMovie" />
+                        <p:inputText id="nameMovie" value="#{postJson.movie.nameMovie}" title="Name movie" />
+
+
+                        <p:outputLabel value="Year movie" for="yearMovie" />
+                        <p:inputText id="yearMovie" value="#{postJson.movie.yearMovie}" title="Year movie" />
+
+                        <p:outputLabel value="Description movie" for="descriptionMovie"/>
+                        <p:inputText id="descriptionMovie" value="#{postJson.movie.descriptionMovie}" title="Description movie"/>
+
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{postJson.createMovie()}" value="Save" update="display,:MovieListForm:datalist" oncomplete="handleSubmit(args,'MovieCreateDialog');"/>
+                    <p:commandButton value="Cancel" immediate="true" onclick="MovieCreateDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+        <p:dialog id="MovieEditDialog" widgetVar="MovieEditDialog" modal="true" resizable="false" appendTo="@(body)" header="Create Movie">
+            <h:form id="MovieEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" >
+                        <p:outputLabel value="Name movie" for="nameMovie" />
+                        <p:inputText id="nameMovie" value="#{gettingJson.movieSelected.nameMovie}" title="Name movie" />
+
+
+                        <p:outputLabel value="Year movie" for="yearMovie" />
+                        <p:inputText id="yearMovie" value="#{gettingJson.movieSelected.yearMovie}" title="Year movie" />
+
+                        <p:outputLabel value="Description movie" for="descriptionMovie"/>
+                        <p:inputText id="descriptionMovie" value="#{gettingJson.movieSelected.descriptionMovie}" title="Description movie"/>
+
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{gettingJson.editMovie()}" value="Edit" update="display,:MovieListForm:datalist" oncomplete="handleSubmit(args,'MovieEditDialog');"/>
+                    <p:commandButton value="Cancel" immediate="true" onclick="MovieEditDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </h:body>
+</html>
+
